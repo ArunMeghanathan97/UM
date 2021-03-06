@@ -78,7 +78,10 @@ class UserListRepoistory
             $dataset->mobile        = $requestData['mobile'];
         }
         if( isset($requestData['profile_img']) ){
-            $dataset->profile_img   = $requestData['profile_img'];
+            $uploadImg              = $this->uploadImg($requestData);
+            if ( $uploadImg['flg'] == true ){
+                $dataset->profile_img= $uploadImg[0]['path'];
+            }
         }
         if( isset($requestData['dob']) ){
             $dataset->dob           = $requestData['dob'];
@@ -103,6 +106,31 @@ class UserListRepoistory
             return [ 'flg' => false, 'data' => [] ];
         }
 
+    }
+
+    public function uploadImg($requestData){
+        $files      = $requestData['profile_img'];
+        $date       = date('Ym');
+        $folderName = storage_path().'/user_'.$date.'/';
+        $next       = 'formshow_'.date('dmY_his');
+        if (!file_exists($folderName)){
+            mkdir($folderName, 0777, true);
+        }
+
+        if (count($files)>0){
+
+            foreach ($files as $k => $v){
+
+                $fil        = explode('base64,', $v['encode']);
+                $file       = base64_decode($fil[1]);
+                $ext        = $v['ext'];
+                file_put_contents($folderName.$next.'.'.$ext, $file) or print_r(error_get_last());
+                $fileName   = 'storage/formshow_'.$date.'/'.$next.'.'.$ext;
+                $return[]   = [ 'path' => $fileName, 'name' => $next.'.'.$ext];
+            }
+
+        }
+        return [ 'flg' => true, 'file' => $return];
     }
 
     public function userDetails($requestData){
