@@ -4,6 +4,7 @@ namespace App\Repoistory;
 
 use Illuminate\Http\Request;
 use App\Models\UserList;
+use DB;
 
 class UserListRepoistory
 {
@@ -14,17 +15,29 @@ class UserListRepoistory
         $total                      = 0;
         $offset                     = 0;
         if ( $page > 1 ) $offset    = $page * 10;
-        $filterlist                 = [];
+        $filterlist                 = $this->getFilterList($requestData);
 
-        $dataset                    = UserList::skip($offset)->take(10)->get();
+        if ( count($filterlist) ){
+            $dataset                = UserList::orWhere($filterlist);
+//            $dataset                = DB::table((new UserList)->user_list); 
+        }else{
+            $dataset                = UserList::where([['id','!=',0]]);
+        }
+
+        $myfile = fopen(__DIR__."/newfile.txt", "w") or die("Unable to open file!");
+        $txt = "". json_encode($dataset);
+        fwrite($myfile, $txt);
+        fclose($myfile);
+
+        $dataset                    = $dataset->skip($offset)->take(10)->get();
         if ( !isset( $dataset ) ){
             $dataset                = [];
         }
 
         $totalset                   = UserList::where([['id','!=',0]]);
-        // if ( $fromdate != '' && $todate != '' ){
-        //     $totalset->whereBetween('created_at',[$fromdate,$todate]);
-        // }
+        if ( count($filterlist) ){
+            $dataset                = $dataset->where($filterlist);
+        }
         $totalset                   = $totalset->orderBy('updated_at','desc')->get();
         if ( isset($totalset) ){
             $total                  = $total + count( $totalset );
@@ -45,16 +58,22 @@ class UserListRepoistory
     public function getFilterList($requestData){
 
         $return                     = [];
-        if ( isset( $requestData['username'] ) ){
-            $return[]               = [ 'username', '=', $requestData['username'] ];
+        if ( isset( $requestData['name'] ) ){
+            $return[]               = [ 'name', '=', $requestData['name'] ];
         }
         if ( isset( $requestData['email'] ) ){
             $return[]               = [ 'email', '=', $requestData['email'] ];
         }
-        if ( isset( $requestData['email'] ) ){
-            $return[]               = [ 'email', '=', $requestData['email'] ];
+        if ( isset( $requestData['mobile'] ) ){
+            $return[]               = [ 'mobile', '=', $requestData['mobile'] ];
         }
-
+        if ( isset( $requestData['state'] ) ){
+            $return[]               = [ 'state', '=', $requestData['state'] ];
+        }
+        if ( isset( $requestData['dob'] ) ){
+            $return[]               = [ 'dob', '=', $requestData['dob'] ];
+        }
+        return $return;
     }
 
     public function saveUser($requestData)
@@ -80,7 +99,8 @@ class UserListRepoistory
         if( isset($requestData['profile_img']) ){
             $uploadImg              = $this->uploadImg($requestData);
             if ( $uploadImg['flg'] == true ){
-                $dataset->profile_img= $uploadImg[0]['path'];
+                if( count($uploadImg['file']) )
+                $dataset->profile_img= $uploadImg['file'][0]['path'];
             }
         }
         if( isset($requestData['dob']) ){
@@ -109,6 +129,8 @@ class UserListRepoistory
     }
 
     public function uploadImg($requestData){
+
+        $return     = [];
         $files      = $requestData['profile_img'];
         $date       = date('Ym');
         $folderName = storage_path().'/user_'.$date.'/';
@@ -125,7 +147,7 @@ class UserListRepoistory
                 $file       = base64_decode($fil[1]);
                 $ext        = $v['ext'];
                 file_put_contents($folderName.$next.'.'.$ext, $file) or print_r(error_get_last());
-                $fileName   = 'storage/formshow_'.$date.'/'.$next.'.'.$ext;
+                $fileName   = 'storage/user_'.$date.'/'.$next.'.'.$ext;
                 $return[]   = [ 'path' => $fileName, 'name' => $next.'.'.$ext];
             }
 
