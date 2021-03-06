@@ -8,36 +8,24 @@ use DB;
 
 class UserListRepoistory
 {
-    
+
     public function getUserList($requestData){
 
         $page                       = ( $requestData['page'] == 0 ? 1 : $requestData['page'] );
         $total                      = 0;
         $offset                     = 0;
         if ( $page > 1 ) $offset    = $page * 10;
-        $filterlist                 = $this->getFilterList($requestData);
 
-        if ( count($filterlist) ){
-            $dataset                = UserList::orWhere($filterlist);
-//            $dataset                = DB::table((new UserList)->user_list); 
-        }else{
-            $dataset                = UserList::where([['id','!=',0]]);
-        }
-
-        $myfile = fopen(__DIR__."/newfile.txt", "w") or die("Unable to open file!");
-        $txt = "". json_encode($dataset);
-        fwrite($myfile, $txt);
-        fclose($myfile);
-
+        $dataset                    = UserList::where([['id','!=',0]]);
+        $dataset                    = $this->getFilterList($dataset,$requestData);
         $dataset                    = $dataset->skip($offset)->take(10)->get();
+
         if ( !isset( $dataset ) ){
             $dataset                = [];
         }
-
         $totalset                   = UserList::where([['id','!=',0]]);
-        if ( count($filterlist) ){
-            $dataset                = $dataset->where($filterlist);
-        }
+        $totalset                   = $this->getFilterList($totalset,$requestData);
+
         $totalset                   = $totalset->orderBy('updated_at','desc')->get();
         if ( isset($totalset) ){
             $total                  = $total + count( $totalset );
@@ -51,29 +39,37 @@ class UserListRepoistory
                 $page_lbl            =  "1 to " . ( $offset + count( $dataset ) ) . " of " .$total;
             }
         }
-
-        return [ 'list' => $dataset, 'page' => $page_lbl, 'page_set' => [ 'page' => $page, 'total' => $total, 'now' =>  ( $offset + count( $dataset ) ) ] ];
+        if ( isset($requestData['export']) ){
+            $list                    = [];
+            foreach( $dataset as $k => $v ){
+                $list[]             = json_decode(json_encode($v),true);
+            }
+            $this->download_send_headers("users-" . date("Y-m-d") . ".csv");
+            echo $this->array2csv($list);
+            die();
+        }else{
+            return [ 'list' => $dataset, 'page' => $page_lbl, 'page_set' => [ 'page' => $page, 'total' => $total, 'now' =>  ( $offset + count( $dataset ) ) ] ];
+        }
     }
 
-    public function getFilterList($requestData){
+    public function getFilterList($dataset,$requestData){
 
-        $return                     = [];
         if ( isset( $requestData['name'] ) ){
-            $return[]               = [ 'name', '=', $requestData['name'] ];
+            $dataset                = $dataset->Where('name','like','%'.$requestData['name'].'%');
         }
         if ( isset( $requestData['email'] ) ){
-            $return[]               = [ 'email', '=', $requestData['email'] ];
+            $dataset                = $dataset->Where('email','like','%'.$requestData['email'].'%');
         }
         if ( isset( $requestData['mobile'] ) ){
-            $return[]               = [ 'mobile', '=', $requestData['mobile'] ];
+            $dataset                = $dataset->Where('mobile','like','%'.$requestData['mobile'].'%');
         }
         if ( isset( $requestData['state'] ) ){
-            $return[]               = [ 'state', '=', $requestData['state'] ];
+            $dataset                = $dataset->Where('state','like','%'.$requestData['state'].'%');
         }
         if ( isset( $requestData['dob'] ) ){
-            $return[]               = [ 'dob', '=', $requestData['dob'] ];
+            $dataset                = $dataset->Where('dob','like','%'.$requestData['dob'].'%');
         }
-        return $return;
+        return $dataset;
     }
 
     public function saveUser($requestData)
@@ -175,6 +171,39 @@ class UserListRepoistory
             $dataset->delete();
         }
 
+    }
+
+    function array2csv(array &$array){
+
+        if (count($array) == 0) {
+            return null;
+        }
+        ob_start();
+        $df = fopen("php://output", 'w');
+        fputcsv($df, array_keys(reset($array)));
+        foreach ($array as $row) {
+            fputcsv($df, $row);
+        }
+        fclose($df);
+        return ob_get_clean();
+
+    }
+
+    function download_send_headers($filename) {
+        // disable caching
+        $now = gmdate("D, d M Y H:i:s");
+        header("Expires: Tue, 03 Jul 2001 06:00:00 GMT");
+        header("Cache-Control: max-age=0, no-cache, must-revalidate, proxy-revalidate");
+        header("Last-Modified: {$now} GMT");
+    
+        // force download  
+        header("Content-Type: application/force-download");
+        header("Content-Type: application/octet-stream");
+        header("Content-Type: application/download");
+    
+        // disposition / encoding on response body
+        header("Content-Disposition: attachment;filename={$filename}");
+        header("Content-Transfer-Encoding: binary");
     }
 
 }
