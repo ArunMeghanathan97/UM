@@ -14,7 +14,9 @@ class UserListRepoistory
         $page                       = ( $requestData['page'] == 0 ? 1 : $requestData['page'] );
         $total                      = 0;
         $offset                     = 0;
-        if ( $page > 1 ) $offset    = $page * 10;
+        if ( $page > 1 ){
+            $offset    = $page * 10;
+        }
 
         $dataset                    = UserList::where([['id','!=',0]]);
         $dataset                    = $this->getFilterList($dataset,$requestData);
@@ -95,8 +97,9 @@ class UserListRepoistory
         if( isset($requestData['profile_img']) ){
             $uploadImg              = $this->uploadImg($requestData);
             if ( $uploadImg['flg'] == true ){
-                if( count($uploadImg['file']) )
-                $dataset->profile_img= $uploadImg['file'][0]['path'];
+                if( count($uploadImg['file']) ){
+                    $dataset->profile_img= $uploadImg['file'][0]['path'];
+                }
             }
         }
         if( isset($requestData['dob']) ){

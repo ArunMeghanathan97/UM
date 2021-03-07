@@ -21,6 +21,8 @@ use App\Http\Controllers\IndexController;
 
 Route::post('list',[IndexController::class,'index']);
 
+Route::get('list',[IndexController::class,'export']);
+
 Route::post('add',[IndexController::class,'addUser']);
 
 Route::post('edit',[IndexController::class,'editUser']);

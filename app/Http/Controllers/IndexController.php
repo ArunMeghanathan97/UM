@@ -10,7 +10,25 @@ class IndexController extends Controller
     public function index(){
 
         $response                    = (object)null;
-        $requestData                 = request()->json()->all();
+        if ( isset($_REQUEST['export']) ){
+            $requestData                 = $_REQUEST;
+        }else{
+            $requestData                 = request()->json()->all();
+        }
+
+        $userlistRepoistory          = new UserListRepoistory();
+        $response->list              = $userlistRepoistory->getUserList($requestData);
+        $response->error             = false;
+        $response->message           = "";
+
+        return json_encode($response);
+
+    }
+
+    public function export(){
+
+        $response                    = (object)null;
+        $requestData                 = $_REQUEST;
 
         $userlistRepoistory          = new UserListRepoistory();
         $response->list              = $userlistRepoistory->getUserList($requestData);
