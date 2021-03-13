@@ -1,62 +1,86 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400"></a></p>
+<h1>Laravel 8 API based CRUD (Create, Read, Update, Delete) User Management</h1>
+<p>This Project is used to you can add, edit, update, delete, search and export using API</p>
+<p>  In "User Management" package we create all of the DB Tables, Entities, Seeders, View for manage users. </p>
 
-<p align="center">
-<a href="https://travis-ci.org/laravel/framework"><img src="https://travis-ci.org/laravel/framework.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+<h1>It handles a management user. Some technicals applied to this project:</h1>
+<ul>
+  <li>Restful webservice</li>
+  <li>Paging</li>
+  <li>Middleware</li>
+  <li>Exception handle</li>
+  <li>PHP artisan</li>
+  <li>Composer</li>
+</ul>
 
-## About Laravel
+<h1> Requirements </h1>
+ <ul>
+    <li>Laravel 8</li>
+    <li>PHP8</li>
+ </ul>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+<h1>Installation</h1>
+<ul> 
+    <li>
+        <p>1. Pull source code from github.</p>
+        <pre>https://github.com/ArunMeghanathan97/UserManagement-Laravel-8.git</pre>
+    </li>
+    <li>
+        <p> 2. Preparing database. We need to prepare default database for the first time use. At backend folder, run: </p>
+        <pre>php artisan migrate</pre>
+    </li>
+    <li>
+        <p>3. Set the application key for back-end. At backend folder, run:</p>
+        <pre>php artisan key:generate</pre>
+    </li>
+</ul>
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+<h1>Usage</h1>
+<p>You also can directly access back-end API via Restful webservice as below:</p>
+<code>
+<table>
+    <tr>
+        <th> Method </th>
+        <th> API </th>
+        <th> Parameters </th>
+        <th> Action </th>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>list</td>
+        <td>page and search params (name , email , mobile ,state , dob) </td>
+        <td> get user list  </td>
+    </tr>
+    <tr>
+        <td>GET</td>
+        <td>list</td>
+        <td>page and search params (name , email , mobile ,state , dob)</td>
+        <td> export user list </td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>add</td>
+        <td>name, username, email, mobile, profile_img, dob, address, city, state, country</td>
+        <td>add new user</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>edit</td>
+        <td>name, username, email, mobile, profile_img, dob, address, city, state, country</td>
+        <td>update user details</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>delete</td>
+        <td>id</td>
+        <td>delete user details</td>
+    </tr>
+    <tr>
+        <td>POST</td>
+        <td>detail</td>
+        <td>id</td>
+        <td>view user details</td>
+    </tr>
+</table>
+</code>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
-
-## Learning Laravel
-
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
-
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains over 1500 video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
-
-## Laravel Sponsors
-
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the Laravel [Patreon page](https://patreon.com/taylorotwell).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Cubet Techno Labs](https://cubettech.com)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[Many](https://www.many.co.uk)**
-- **[Webdock, Fast VPS Hosting](https://www.webdock.io/en)**
-- **[DevSquad](https://devsquad.com)**
-- **[Curotec](https://www.curotec.com/)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+<p> <b>Arunkumar</b> - full stack software engineer</p>
